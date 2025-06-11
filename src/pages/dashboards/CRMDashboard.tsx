@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { DashboardLayout } from "@/components/shared/DashboardLayout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,7 +19,9 @@ import {
   TrendingUp,
   DollarSign,
   Phone,
-  Zap
+  Zap,
+  Activity,
+  BarChart3
 } from "lucide-react"
 import { 
   BarChart, 
@@ -29,7 +32,10 @@ import {
   Tooltip, 
   ResponsiveContainer,
   LineChart,
-  Line
+  Line,
+  PieChart,
+  Pie,
+  Cell
 } from "recharts"
 import { useToast } from "@/hooks/use-toast"
 
@@ -110,6 +116,13 @@ const CRMDashboard = () => {
     { month: "Jun", value: 203000 },
   ]
 
+  const dealStageData = [
+    { name: "Discovery", value: 25, color: "#3b82f6" },
+    { name: "Proposal", value: 35, color: "#eab308" },
+    { name: "Negotiation", value: 25, color: "#f97316" },
+    { name: "Closed Won", value: 15, color: "#22c55e" }
+  ]
+
   // Calculate stats from current data
   const stats = [
     { 
@@ -117,6 +130,7 @@ const CRMDashboard = () => {
       value: contacts.length.toString(), 
       icon: Users, 
       color: "text-blue-600",
+      bgColor: "bg-blue-50",
       change: "+12%",
       trend: "up"
     },
@@ -125,6 +139,7 @@ const CRMDashboard = () => {
       value: deals.filter(d => d.stage !== "Closed Won" && d.stage !== "Closed Lost").length.toString(), 
       icon: Target, 
       color: "text-purple-600",
+      bgColor: "bg-purple-50",
       change: "+8%",
       trend: "up"
     },
@@ -133,6 +148,7 @@ const CRMDashboard = () => {
       value: `$${deals.reduce((sum, deal) => sum + parseInt(deal.value.replace(/[$,]/g, '')), 0).toLocaleString()}`, 
       icon: DollarSign, 
       color: "text-green-600",
+      bgColor: "bg-green-50",
       change: "+15%",
       trend: "up"
     },
@@ -141,6 +157,7 @@ const CRMDashboard = () => {
       value: meetings.length.toString(), 
       icon: Calendar, 
       color: "text-orange-600",
+      bgColor: "bg-orange-50",
       change: "+5%",
       trend: "up"
     },
@@ -153,6 +170,10 @@ const CRMDashboard = () => {
     } else {
       setContacts([...contacts, { ...contact, id: Date.now().toString() }])
     }
+    toast({
+      title: "Success",
+      description: "Contact saved successfully",
+    })
   }
 
   const handleDeleteContact = (id: string) => {
@@ -169,6 +190,10 @@ const CRMDashboard = () => {
     } else {
       setDeals([...deals, { ...deal, id: Date.now().toString() }])
     }
+    toast({
+      title: "Success",
+      description: "Deal saved successfully",
+    })
   }
 
   const handleScheduleMeeting = (meeting: any) => {
@@ -177,42 +202,64 @@ const CRMDashboard = () => {
     } else {
       setMeetings([...meetings, { ...meeting, id: Date.now().toString() }])
     }
+    toast({
+      title: "Success",
+      description: "Meeting scheduled successfully",
+    })
   }
 
   const handleSendCampaign = (campaign: any) => {
     setCampaigns([...campaigns, { ...campaign, id: Date.now().toString() }])
+    toast({
+      title: "Success",
+      description: "Email campaign sent successfully",
+    })
   }
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case "Discovery": return "bg-blue-100 text-blue-800"
-      case "Proposal": return "bg-yellow-100 text-yellow-800"
-      case "Negotiation": return "bg-orange-100 text-orange-800"
-      case "Closed Won": return "bg-green-100 text-green-800"
-      case "Closed Lost": return "bg-red-100 text-red-800"
-      default: return "bg-gray-100 text-gray-800"
+      case "Discovery": return "bg-blue-100 text-blue-800 border-blue-200"
+      case "Proposal": return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "Negotiation": return "bg-orange-100 text-orange-800 border-orange-200"
+      case "Closed Won": return "bg-green-100 text-green-800 border-green-200"
+      case "Closed Lost": return "bg-red-100 text-red-800 border-red-200"
+      default: return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
 
   return (
     <DashboardLayout title="CRM Dashboard">
-      <div className="space-y-6 animate-in fade-in-50 duration-500">
-        {/* Stats Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="space-y-8 animate-in fade-in-50 duration-700">
+        {/* Enhanced Stats Grid with Animations */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => {
             const Icon = stat.icon
             return (
-              <Card key={index} className="hover:shadow-md transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                  <Icon className={`h-4 w-4 ${stat.color}`} />
+              <Card 
+                key={index} 
+                className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 border-0 shadow-md hover:scale-105 animate-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className={`absolute inset-0 ${stat.bgColor} opacity-10 group-hover:opacity-20 transition-opacity duration-300`} />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/5 to-transparent rounded-bl-full" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+                  <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                    {stat.title}
+                  </CardTitle>
+                  <div className={`p-2 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                    <Icon className={`h-5 w-5 ${stat.color}`} />
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <div className="flex items-center text-xs text-muted-foreground">
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                    <span className="text-green-500">{stat.change}</span>
-                    <span className="ml-1">from last month</span>
+                <CardContent className="relative z-10">
+                  <div className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-200">
+                    {stat.value}
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground mt-2">
+                    <div className="flex items-center">
+                      <TrendingUp className="h-4 w-4 text-green-500 mr-1 animate-pulse" />
+                      <span className="text-green-500 font-medium">{stat.change}</span>
+                      <span className="ml-1">from last month</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -220,78 +267,225 @@ const CRMDashboard = () => {
           })}
         </div>
 
-        {/* Charts and Quick Actions */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales Pipeline</CardTitle>
-              <CardDescription>Leads vs Closed Deals</CardDescription>
+        {/* Enhanced Charts Grid */}
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Sales Pipeline Chart */}
+          <Card className="lg:col-span-2 hover:shadow-xl transition-all duration-300 animate-in slide-in-from-left-6 delay-200">
+            <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Sales Pipeline
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Monthly leads vs closed deals performance
+                  </CardDescription>
+                </div>
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <BarChart3 className="h-6 w-6 text-primary" />
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="leads" fill="hsl(var(--primary))" name="Leads" />
-                  <Bar dataKey="deals" fill="hsl(var(--muted))" name="Deals" />
+            <CardContent className="pt-6">
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="month" 
+                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                    tickLine={{ stroke: "hsl(var(--border))" }}
+                  />
+                  <YAxis 
+                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                    tickLine={{ stroke: "hsl(var(--border))" }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "hsl(var(--card))", 
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                      boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+                    }} 
+                  />
+                  <Bar 
+                    dataKey="leads" 
+                    fill="hsl(var(--primary))" 
+                    name="Leads" 
+                    radius={[4, 4, 0, 0]}
+                    className="animate-in slide-in-from-bottom-4 duration-700 delay-500"
+                  />
+                  <Bar 
+                    dataKey="deals" 
+                    fill="hsl(var(--muted))" 
+                    name="Deals" 
+                    radius={[4, 4, 0, 0]}
+                    className="animate-in slide-in-from-bottom-4 duration-700 delay-700"
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue Trend</CardTitle>
-              <CardDescription>Monthly revenue growth</CardDescription>
+          {/* Deal Stage Distribution */}
+          <Card className="hover:shadow-xl transition-all duration-300 animate-in slide-in-from-right-6 delay-300">
+            <CardHeader className="border-b bg-gradient-to-r from-purple-500/5 to-transparent">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg font-semibold">Deal Stages</CardTitle>
+                  <CardDescription>Current distribution</CardDescription>
+                </div>
+                <div className="p-2 bg-purple-500/10 rounded-lg">
+                  <Target className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={revenueData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']} />
-                  <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={3} />
-                </LineChart>
+            <CardContent className="pt-6">
+              <ResponsiveContainer width="100%" height={280}>
+                <PieChart>
+                  <Pie
+                    data={dealStageData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={5}
+                    dataKey="value"
+                    className="animate-in fade-in-50 duration-1000 delay-800"
+                  >
+                    {dealStageData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: "hsl(var(--card))", 
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px"
+                    }} 
+                  />
+                </PieChart>
               </ResponsiveContainer>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                {dealStageData.map((item, index) => (
+                  <div 
+                    key={item.name} 
+                    className="flex items-center gap-2 animate-in slide-in-from-bottom-2 duration-300"
+                    style={{ animationDelay: `${900 + index * 100}ms` }}
+                  >
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="text-sm text-muted-foreground">{item.name}</span>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common CRM tasks</CardDescription>
+        {/* Revenue Trend Chart */}
+        <Card className="hover:shadow-xl transition-all duration-300 animate-in slide-in-from-bottom-6 delay-400">
+          <CardHeader className="border-b bg-gradient-to-r from-green-500/5 to-transparent">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-semibold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Revenue Trend
+                </CardTitle>
+                <CardDescription>Monthly revenue growth trajectory</CardDescription>
+              </div>
+              <div className="p-2 bg-green-500/10 rounded-lg">
+                <Activity className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={revenueData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="month" 
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  tickLine={{ stroke: "hsl(var(--border))" }}
+                />
+                <YAxis 
+                  tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  tickLine={{ stroke: "hsl(var(--border))" }}
+                />
+                <Tooltip 
+                  formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Revenue']}
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))", 
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+                  }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={3}
+                  dot={{ fill: "hsl(var(--primary))", strokeWidth: 2, r: 6 }}
+                  activeDot={{ r: 8, className: "animate-pulse" }}
+                  className="animate-in slide-in-from-left-6 duration-1000 delay-600"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Enhanced Quick Actions */}
+        <Card className="hover:shadow-xl transition-all duration-300 animate-in slide-in-from-bottom-6 delay-500">
+          <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-transparent">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-semibold">Quick Actions</CardTitle>
+                <CardDescription>Streamline your CRM workflow with one-click actions</CardDescription>
+              </div>
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Zap className="h-6 w-6 text-primary animate-pulse" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <ContactModal onSave={handleSaveContact}>
-                <Button className="w-full justify-start" variant="outline">
-                  <UserPlus className="mr-2 h-4 w-4" />
+                <Button 
+                  className="w-full justify-start group hover:scale-105 transition-all duration-200 hover:shadow-lg animate-in slide-in-from-left-4 delay-600" 
+                  variant="outline"
+                >
+                  <UserPlus className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Add New Contact
                 </Button>
               </ContactModal>
               
               <MeetingScheduler onSchedule={handleScheduleMeeting}>
-                <Button className="w-full justify-start" variant="outline">
-                  <Calendar className="mr-2 h-4 w-4" />
+                <Button 
+                  className="w-full justify-start group hover:scale-105 transition-all duration-200 hover:shadow-lg animate-in slide-in-from-left-4 delay-700" 
+                  variant="outline"
+                >
+                  <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Schedule Meeting
                 </Button>
               </MeetingScheduler>
               
               <DealModal onSave={handleSaveDeal}>
-                <Button className="w-full justify-start" variant="outline">
-                  <Target className="mr-2 h-4 w-4" />
+                <Button 
+                  className="w-full justify-start group hover:scale-105 transition-all duration-200 hover:shadow-lg animate-in slide-in-from-left-4 delay-800" 
+                  variant="outline"
+                >
+                  <Target className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Create Deal
                 </Button>
               </DealModal>
               
               <EmailCampaign contacts={contacts} onSend={handleSendCampaign}>
-                <Button className="w-full justify-start" variant="outline">
-                  <Mail className="mr-2 h-4 w-4" />
+                <Button 
+                  className="w-full justify-start group hover:scale-105 transition-all duration-200 hover:shadow-lg animate-in slide-in-from-left-4 delay-900" 
+                  variant="outline"
+                >
+                  <Mail className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
                   Send Email Campaign
                 </Button>
               </EmailCampaign>
@@ -299,45 +493,60 @@ const CRMDashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Contacts and Deals */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          <ContactList 
-            contacts={contacts} 
-            onUpdateContact={handleSaveContact}
-            onDeleteContact={handleDeleteContact}
-          />
+        {/* Enhanced Contacts and Deals Grid */}
+        <div className="grid gap-8 lg:grid-cols-2">
+          <div className="animate-in slide-in-from-left-6 delay-600">
+            <ContactList 
+              contacts={contacts} 
+              onUpdateContact={handleSaveContact}
+              onDeleteContact={handleDeleteContact}
+            />
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Active Deals</CardTitle>
-              <CardDescription>Deals in progress</CardDescription>
+          <Card className="hover:shadow-xl transition-all duration-300 animate-in slide-in-from-right-6 delay-700">
+            <CardHeader className="border-b bg-gradient-to-r from-purple-500/5 to-transparent">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-semibold">Active Deals</CardTitle>
+                  <CardDescription>Track your sales pipeline progress</CardDescription>
+                </div>
+                <div className="p-2 bg-purple-500/10 rounded-lg">
+                  <Target className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <div className="space-y-4">
                 {deals.map((deal, index) => (
-                  <div key={index} className="p-4 rounded-lg border hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">{deal.name}</h4>
-                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStageColor(deal.stage)}`}>
+                  <div 
+                    key={index} 
+                    className="p-4 rounded-xl border bg-gradient-to-r from-card to-card/50 hover:from-muted/50 hover:to-card transition-all duration-300 hover:shadow-md group animate-in slide-in-from-right-4"
+                    style={{ animationDelay: `${800 + index * 100}ms` }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-lg group-hover:text-primary transition-colors">{deal.name}</h4>
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200 group-hover:scale-105 ${getStageColor(deal.stage)}`}>
                         {deal.stage}
                       </div>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-2">{deal.company}</p>
-                    <p className="text-xs text-muted-foreground mb-3">{deal.description}</p>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">{deal.value}</span>
-                      <span className="text-sm text-muted-foreground">{deal.progress}%</span>
+                    <p className="text-muted-foreground font-medium mb-2">{deal.company}</p>
+                    <p className="text-sm text-muted-foreground mb-4">{deal.description}</p>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="font-bold text-lg text-primary">{deal.value}</span>
+                      <span className="text-sm font-medium text-muted-foreground">{deal.progress}%</span>
                     </div>
-                    <Progress value={deal.progress} className="h-2" />
-                    <div className="flex gap-2 mt-3">
+                    <Progress value={deal.progress} className="h-2 mb-4" />
+                    <div className="flex gap-2">
                       <DealModal deal={deal} onSave={handleSaveDeal}>
-                        <Button size="sm" variant="outline">Edit</Button>
+                        <Button size="sm" variant="outline" className="group-hover:scale-105 transition-transform">
+                          Edit
+                        </Button>
                       </DealModal>
-                      <Button size="sm" variant="ghost">
+                      <Button size="sm" variant="ghost" className="group-hover:scale-105 transition-transform">
                         <Phone className="h-3 w-3 mr-1" />
                         Call
                       </Button>
-                      <Button size="sm" variant="ghost">
+                      <Button size="sm" variant="ghost" className="group-hover:scale-105 transition-transform">
                         <Mail className="h-3 w-3 mr-1" />
                         Email
                       </Button>
@@ -349,48 +558,55 @@ const CRMDashboard = () => {
           </Card>
         </div>
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest CRM activities and updates</CardDescription>
+        {/* Enhanced Recent Activity */}
+        <Card className="hover:shadow-xl transition-all duration-300 animate-in slide-in-from-bottom-6 delay-800">
+          <CardHeader className="border-b bg-gradient-to-r from-blue-500/5 to-transparent">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-semibold">Recent Activity</CardTitle>
+                <CardDescription>Stay updated with the latest CRM activities and interactions</CardDescription>
+              </div>
+              <div className="p-2 bg-blue-500/10 rounded-lg">
+                <Activity className="h-6 w-6 text-blue-600 animate-pulse" />
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-4">
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">New contact added: Sarah Johnson</p>
-                  <p className="text-xs text-muted-foreground">2 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Deal updated: Website Redesign moved to Proposal</p>
-                  <p className="text-xs text-muted-foreground">15 minutes ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Meeting scheduled with Enterprise Solutions</p>
-                  <p className="text-xs text-muted-foreground">1 hour ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/50">
-                <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Email campaign sent to 150 contacts</p>
-                  <p className="text-xs text-muted-foreground">3 hours ago</p>
-                </div>
-              </div>
+              {[
+                { color: "bg-green-500", title: "New contact added: Sarah Johnson", time: "2 minutes ago", icon: UserPlus },
+                { color: "bg-blue-500", title: "Deal updated: Website Redesign moved to Proposal", time: "15 minutes ago", icon: Target },
+                { color: "bg-orange-500", title: "Meeting scheduled with Enterprise Solutions", time: "1 hour ago", icon: Calendar },
+                { color: "bg-purple-500", title: "Email campaign sent to 150 contacts", time: "3 hours ago", icon: Mail }
+              ].map((activity, index) => {
+                const Icon = activity.icon
+                return (
+                  <div 
+                    key={index}
+                    className="flex items-center space-x-4 p-4 rounded-xl bg-gradient-to-r from-muted/30 to-transparent hover:from-muted/50 hover:to-muted/10 transition-all duration-300 group animate-in slide-in-from-left-4"
+                    style={{ animationDelay: `${900 + index * 100}ms` }}
+                  >
+                    <div className={`w-3 h-3 rounded-full ${activity.color} animate-pulse group-hover:scale-125 transition-transform`}></div>
+                    <div className={`p-2 rounded-lg bg-muted group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium leading-tight group-hover:text-primary transition-colors">
+                        {activity.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {activity.time}
+                      </p>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Floating Action Button */}
+      {/* Enhanced Floating Action Button */}
       <FloatingActionButton
         contacts={contacts}
         onSaveContact={handleSaveContact}

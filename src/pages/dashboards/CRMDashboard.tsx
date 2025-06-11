@@ -1,4 +1,3 @@
-
 import { useState } from "react"
 import { DashboardLayout } from "@/components/shared/DashboardLayout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,6 +8,7 @@ import { DealModal } from "@/components/crm/DealModal"
 import { MeetingScheduler } from "@/components/crm/MeetingScheduler"
 import { EmailCampaign } from "@/components/crm/EmailCampaign"
 import { ContactList } from "@/components/crm/ContactList"
+import { FloatingActionButton } from "@/components/crm/FloatingActionButton"
 import { 
   Users, 
   UserPlus, 
@@ -17,7 +17,8 @@ import {
   Mail,
   TrendingUp,
   DollarSign,
-  Phone
+  Phone,
+  Zap
 } from "lucide-react"
 import { 
   BarChart, 
@@ -195,7 +196,7 @@ const CRMDashboard = () => {
 
   return (
     <DashboardLayout title="CRM Dashboard">
-      <div className="space-y-6">
+      <div className="space-y-6 animate-in fade-in-50 duration-500">
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => {
@@ -388,6 +389,15 @@ const CRMDashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        contacts={contacts}
+        onSaveContact={handleSaveContact}
+        onScheduleMeeting={handleScheduleMeeting}
+        onSaveDeal={handleSaveDeal}
+        onSendCampaign={handleSendCampaign}
+      />
     </DashboardLayout>
   )
 }

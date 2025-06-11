@@ -39,6 +39,18 @@ import {
 } from "recharts"
 import { useToast } from "@/hooks/use-toast"
 
+type DealStage = "Discovery" | "Proposal" | "Negotiation" | "Closed Won" | "Closed Lost"
+
+interface Deal {
+  id: string
+  name: string
+  company: string
+  value: string
+  stage: DealStage
+  progress: number
+  description: string
+}
+
 const CRMDashboard = () => {
   const { toast } = useToast()
   
@@ -80,11 +92,11 @@ const CRMDashboard = () => {
   ])
 
   // State management for deals
-  const [deals, setDeals] = useState([
-    { id: "1", name: "Website Redesign", company: "TechCorp", value: "$45,000", stage: "Proposal" as const, progress: 75, description: "Complete website overhaul" },
-    { id: "2", name: "Mobile App Dev", company: "StartupXYZ", value: "$23,000", stage: "Negotiation" as const, progress: 60, description: "iOS and Android app" },
-    { id: "3", name: "Cloud Migration", company: "Enterprise", value: "$67,000", stage: "Discovery" as const, progress: 25, description: "AWS cloud migration" },
-    { id: "4", name: "AI Integration", company: "Innovate Labs", value: "$34,000", stage: "Closed Won" as const, progress: 100, description: "AI chatbot integration" }
+  const [deals, setDeals] = useState<Deal[]>([
+    { id: "1", name: "Website Redesign", company: "TechCorp", value: "$45,000", stage: "Proposal", progress: 75, description: "Complete website overhaul" },
+    { id: "2", name: "Mobile App Dev", company: "StartupXYZ", value: "$23,000", stage: "Negotiation", progress: 60, description: "iOS and Android app" },
+    { id: "3", name: "Cloud Migration", company: "Enterprise", value: "$67,000", stage: "Discovery", progress: 25, description: "AWS cloud migration" },
+    { id: "4", name: "AI Integration", company: "Innovate Labs", value: "$34,000", stage: "Closed Won", progress: 100, description: "AI chatbot integration" }
   ])
 
   // State management for meetings
@@ -216,7 +228,7 @@ const CRMDashboard = () => {
     })
   }
 
-  const getStageColor = (stage: string) => {
+  const getStageColor = (stage: DealStage) => {
     switch (stage) {
       case "Discovery": return "bg-blue-100 text-blue-800 border-blue-200"
       case "Proposal": return "bg-yellow-100 text-yellow-800 border-yellow-200"

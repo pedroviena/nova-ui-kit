@@ -15,6 +15,15 @@ interface FloatingActionButtonProps {
   onSendCampaign: (campaign: any) => void
 }
 
+interface ActionConfig {
+  component: React.ComponentType<any>
+  props: Record<string, any>
+  icon: React.ComponentType<any>
+  label: string
+  color: string
+  delay: string
+}
+
 export function FloatingActionButton({
   contacts,
   onSaveContact,
@@ -24,7 +33,7 @@ export function FloatingActionButton({
 }: FloatingActionButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
 
-  const actions = [
+  const actions: ActionConfig[] = [
     {
       component: ContactModal,
       props: { onSave: onSaveContact },

@@ -179,7 +179,7 @@ export function EmailCampaign({ campaign, onSend, children, contacts = [] }: Ema
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Use {{`{name}`}}, {{`{company}`}} for personalization
+              Use {"{name}"}, {"{company}"} for personalization
             </p>
           </div>
           

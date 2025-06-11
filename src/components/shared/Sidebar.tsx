@@ -13,7 +13,10 @@ import {
   TrendingUp,
   DollarSign,
   Calendar,
-  MessageSquare
+  MessageSquare,
+  Target,
+  Phone,
+  Mail
 } from "lucide-react"
 
 interface SidebarProps {
@@ -25,13 +28,15 @@ export function Sidebar({ className }: SidebarProps) {
   const location = useLocation()
 
   const navigation = [
-    { name: "Dashboard", href: "/dashboards/admin", icon: Home },
+    { name: "Admin Dashboard", href: "/dashboards/admin", icon: Home },
+    { name: "CRM Dashboard", href: "/dashboards/crm", icon: Users },
+    { name: "Finance Dashboard", href: "/dashboards/finance", icon: DollarSign },
     { name: "Analytics", href: "#", icon: BarChart3 },
-    { name: "Users", href: "#", icon: Users },
-    { name: "Revenue", href: "#", icon: DollarSign },
-    { name: "Reports", href: "#", icon: TrendingUp },
+    { name: "Contacts", href: "/dashboards/crm", icon: Phone },
+    { name: "Deals", href: "/dashboards/crm", icon: Target },
     { name: "Calendar", href: "#", icon: Calendar },
     { name: "Messages", href: "#", icon: MessageSquare },
+    { name: "Reports", href: "#", icon: TrendingUp },
     { name: "Settings", href: "#", icon: Settings },
   ]
 
@@ -44,7 +49,7 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <h2 className="text-lg font-semibold">Dashboard</h2>
+            <h2 className="text-lg font-semibold">CRM Pro</h2>
           )}
           <Button
             variant="ghost"
@@ -79,6 +84,14 @@ export function Sidebar({ className }: SidebarProps) {
           )
         })}
       </nav>
+      
+      {!collapsed && (
+        <div className="p-4 border-t">
+          <div className="text-xs text-muted-foreground text-center">
+            CRM Pro v2.0
+          </div>
+        </div>
+      )}
     </div>
   )
 }
